@@ -1,13 +1,13 @@
 ---
 
 - name: Provision a CentOS VM on libvirt
-  hosts: rhel68
+  hosts: vm
   user: root
   strategy: debug
   gather_facts: no
 
   vars:
-    vm_ipaddr: 192.168.2.65
+    vm_ipaddr: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
     vm_netmask: 255.255.255.0
     vm_gateway: 192.168.2.1
     vm_dns: 192.168.2.1
