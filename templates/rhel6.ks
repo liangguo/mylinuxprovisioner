@@ -5,7 +5,7 @@ install
 url --url {{ vm_base_url }}yum/{{ vm_repo_name }}
 lang en_US.UTF-8
 keyboard us
-network --onboot yes --device eth0 --bootproto static  --ip={{ vm_ipaddr }} --netmask={{ vm_netmask }} --gateway={{ vm_gateway }} --nameserver={{ vm_dns }} --noipv6
+network --hostname {{ vm_repo_name }} --onboot yes --device eth0 --bootproto static  --ip={{ vm_ipaddr }} --netmask={{ vm_netmask }} --gateway={{ vm_gateway }} --nameserver={{ vm_dns }} --noipv6
 
 rootpw  "rhelrhel"
 
