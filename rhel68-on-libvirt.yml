@@ -1,0 +1,74 @@
+---
+
+- name: Provision a CentOS VM on libvirt
+  hosts: rhel68
+  user: root
+  strategy: debug
+  gather_facts: no
+
+  vars:
+    vm_ipaddr: 192.168.2.65
+    vm_netmask: 255.255.255.0
+    vm_gateway: 192.168.2.1
+    vm_dns: 192.168.2.1
+    vm_base_url: http://192.168.2.12/y/
+    vm_repo_name: rhel69
+
+  tasks:
+  - delegate_to: "{{ on_host }}"
+    block:
+    - name: Allocate storage for the VM
+      qemu_img:
+        dest: "/y/vm/{{ inventory_hostname }}.qcow2"
+        size: 10240
+
+    - name: Create a VM definition
+      template:
+        src: templates/vm.xml
+        dest: "/tmp/{{ inventory_hostname }}.xml"
+
+    - name: Create the VM
+      virt_guest:
+        guest: "{{ inventory_hostname }}"
+        src: "/tmp/{{ inventory_hostname }}.xml"
+      register: guests
+
+    - name: Create a group of unprovisioned systems
+      group_by:
+        key: "{{ guests.provisioning_status }}"
+
+    - name: Create VM ks files
+      template:
+        src: templates/rhel6.ks
+        dest: "/y/www/ks/{{ inventory_hostname }}.ks"
+
+    - name: Boot the VM using the PXE images
+      virt_boot:
+        guest: "{{ inventory_hostname }}"
+        kernel: "/y/www/yum/{{ vm_repo_name }}/isolinux/vmlinuz"
+        initrd: "/y/www/yum/{{ vm_repo_name }}/isolinux/initrd.img"
+        cmdline: "text ksdevice=eth0 ip={{ vm_ipaddr }} netmask={{ vm_netmask }} gateway={{ vm_gateway }} ks={{vm_base_url}}ks/{{ inventory_hostname }}.ks "
+
+    - name: Wait until the VM stops
+      virt:
+        name: "{{ inventory_hostname }}"
+        command: status
+      register: result
+      until: "{{ result.status == 'shutdown' }}"
+      delay: 10
+      retries: 120
+
+    - name: Start the VM
+      virt_boot:
+        guest: "{{ inventory_hostname }}"
+        boot: hd
+
+    - name: Remove ks file
+      file:
+        path:  "/y/www/ks/{{ inventory_hostname }}.ks"
+        state: absent
+
+    - name: Remove ks file
+      file:
+        path:  "/tmp/{{ inventory_hostname }}.xml"
+        state: absent

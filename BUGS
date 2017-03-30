@@ -1,0 +1,5 @@
+* RHEL 6 may not shutdown vm automatically after install , it need be shutdown 
+  manually to continue the playbook.
+
+* RHEL 6 may not properly configure the network when using static ip address, 
+  you should press "Enter" several times to acqire the kitchstart file.
