@@ -47,7 +47,7 @@
         guest: "{{ inventory_hostname }}"
         kernel: "/y/www/yum/{{ vm_repo_name }}/isolinux/vmlinuz"
         initrd: "/y/www/yum/{{ vm_repo_name }}/isolinux/initrd.img"
-        cmdline: "text ksdevice=eth0 ip={{ vm_ipaddr }} netmask={{ vm_netmask }} gateway={{ vm_gateway }} ks={{vm_base_url}}ks/{{ inventory_hostname }}.ks "
+        cmdline: "text ip={{ vm_ipaddr }} netmask={{ vm_netmask }} gateway={{ vm_gateway }} ks={{vm_base_url}}ks/{{ inventory_hostname }}.ks "
 
     - name: Wait until the VM stops
       virt:
