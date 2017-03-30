@@ -16,8 +16,8 @@ rootpw  "rhelrhel"
 # rootpw --iscrypted $6$8DjkkVKRlk.uMPc6$3nUt8lyqNRlXAHMdyFde4ecuzOjQBaaMZmB6CZvaBSl01rH7ma00Ie1E.nFu9AdXKqysfAJchGYlCl2ECwbuQ1
 firewall --service=ssh
 authconfig --enableshadow --passalgo=sha512
-selinux --enforcing
-timezone Asia/Shanghai
+selinux --disabled
+timezone Asia/Shanghai --utc
 bootloader --location=mbr --driveorder=vda --append="crashkernel=auto rhgb quiet"
 firstboot --disable
 poweroff
@@ -61,4 +61,11 @@ certmonger
 pam_krb5
 krb5-workstation
 perl-DBD-SQLite
+%end
+
+%post --log=/root/ks-post.log
+mkdir /root/.ssh
+wget {{ vm_base_url }}/authorized_keys -O /root/.ssh/authorized_keys
+chmod 700 /root/.ssh
+chmod 600 /root/.ssh/authorized_keys
 %end

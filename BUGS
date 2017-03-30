@@ -3,3 +3,6 @@
 
 * RHEL 6 may not properly configure the network when using static ip address, 
   you should press "Enter" several times to acqire the kitchstart file.
+
+* SELinux is disabled in ks, if enabled, ssh publickey login may fail due to 
+  SELinux context problem.
