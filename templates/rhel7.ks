@@ -42,6 +42,7 @@ selinux --disabled
 @core
 kexec-tools
 wget
+yum-utils
 %end
 
 
@@ -50,5 +51,6 @@ mkdir /root/.ssh
 wget {{ vm_base_url }}/authorized_keys -O /root/.ssh/authorized_keys
 chmod 700 /root/.ssh
 chmod 600 /root/.ssh/authorized_keys
+yum-config-manager --add-repo  {{ vm_base_url }}yum/{{ vm_repo_name }}
 %end
 
