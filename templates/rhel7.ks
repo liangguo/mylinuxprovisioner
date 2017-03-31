@@ -41,6 +41,14 @@ selinux --disabled
 @^minimal
 @core
 kexec-tools
+wget
+%end
 
+
+%post --log=/root/ks-post.log
+mkdir /root/.ssh
+wget {{ vm_base_url }}/authorized_keys -O /root/.ssh/authorized_keys
+chmod 700 /root/.ssh
+chmod 600 /root/.ssh/authorized_keys
 %end
 
