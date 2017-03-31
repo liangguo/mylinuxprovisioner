@@ -1,7 +1,7 @@
 ---
 
 - name: Provision a CentOS VM on libvirt
-  hosts: vm
+  hosts: vm7
   user: root
   strategy: debug
   gather_facts: no
@@ -12,7 +12,7 @@
     vm_gateway: 192.168.2.1
     vm_dns: 192.168.2.1
     vm_base_url: http://192.168.2.12/y/
-    vm_repo_name: rhel70
+    vm_repo_name: rhel73
 
   tasks:
   - delegate_to: "{{ on_host }}"
@@ -47,9 +47,7 @@
         guest: "{{ inventory_hostname }}"
         kernel: "/y/www/yum/{{ vm_repo_name }}/images/pxeboot/vmlinuz"
         initrd: "/y/www/yum/{{ vm_repo_name }}/images/pxeboot/initrd.img"
-#        cmdline: "inst.text ip=dhcp inst.ks={{vm_base_url}}ks/{{ inventory_hostname }}.ks "
-        cmdline: "inst.text devfs=nomount ip={{ vm_ipaddr }}::{{ vm_gateway }}:{{ vm_netmask }}:{{ inventory_hostname }}:eth0:none inst.stage2={{ vm_base_url }}yum/{{ vm_repo_name }} inst.sshd inst.ks={{vm_base_url}}ks/{{ inventory_hostname }}.ks "
-#        cmdline: "inst.sshd ip={{ vm_ipaddr }}:{{ vm_netmask }}:{{ vm_gateway }} inst.stage2={{ vm_base_url }}yum/{{ vm_repo_name }} inst.ks={{vm_base_url}}ks/{{ inventory_hostname }}.ks "
+        cmdline: "inst.text ip={{ vm_ipaddr }}::{{ vm_gateway }}:{{ vm_netmask }}:{{ inventory_hostname }}:eth0:none inst.ks={{vm_base_url}}ks/{{ inventory_hostname }}.ks "
 
     - name: Wait until the VM stops
       virt:

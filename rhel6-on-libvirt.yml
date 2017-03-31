@@ -1,7 +1,7 @@
 ---
 
 - name: Provision a CentOS VM on libvirt
-  hosts: vm
+  hosts: vm6
   user: root
   strategy: debug
   gather_facts: no
