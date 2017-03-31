@@ -19,7 +19,7 @@ eula --agreed
 firstboot --disable
 # Network information
 network  --bootproto=static --device=eth0 --gateway={{ vm_gateway }}  --ip={{ vm_ipaddr }} --nameserver={{ vm_dns }} --netmask={{ vm_netmask }} --ipv6=auto --activate
-network  --hostname={{ vm_repo_name }}
+network  --hostname={{ inventory_hostname }}
 
 shutdown
 
