@@ -3,7 +3,6 @@
 - name: Provision a CentOS VM on libvirt
   hosts: vm6
   user: root
-  strategy: debug
   gather_facts: no
 
   vars:
@@ -13,10 +12,14 @@
     vm_dns: 192.168.2.1
     vm_base_url: http://192.168.2.12/y/
     vm_repo_name: rhel69
+    force_create: false
 
   tasks:
   - delegate_to: "{{ on_host }}"
     block:
+    
+    - include: destroyvm.yml 
+
     - name: Allocate storage for the VM
       qemu_img:
         dest: "/y/vm/{{ inventory_hostname }}.qcow2"
