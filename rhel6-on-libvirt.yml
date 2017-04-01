@@ -48,8 +48,8 @@
     - name: Boot the VM using the PXE images
       virt_boot:
         guest: "{{ inventory_hostname }}"
-        kernel: "/y/www/yum/{{ vm_repo_name }}/isolinux/vmlinuz"
-        initrd: "/y/www/yum/{{ vm_repo_name }}/isolinux/initrd.img"
+        kernel: "/y/www/yum/{{ vm_repo_name }}/images/pxeboot/vmlinuz"
+        initrd: "/y/www/yum/{{ vm_repo_name }}/images/pxeboot/initrd.img"
         cmdline: "text ip={{ vm_ipaddr }} netmask={{ vm_netmask }} gateway={{ vm_gateway }} ks={{vm_base_url}}ks/{{ inventory_hostname }}.ks "
 
     - name: Wait until the VM stops
