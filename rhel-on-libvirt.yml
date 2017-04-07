@@ -36,8 +36,8 @@
       file:
         path:  "/y/vm/{{ inventory_hostname }}.qcow2"
         state: absent
-        when: force_create == "true"
-        tags: removevm
+      when: force_create == "true"
+      tags: removevm
       ignore_errors: True
 
     - name: Allocate storage for the VM
