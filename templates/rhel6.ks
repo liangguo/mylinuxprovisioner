@@ -5,7 +5,7 @@ install
 url --url {{ vm_base_url }}yum/{{ vm_repo_name }}
 lang en_US.UTF-8
 keyboard us
-network --hostname {{ vm_repo_name }} --onboot yes --device eth0 --bootproto static  --ip={{ vm_ipaddr }} --netmask={{ vm_netmask }} --gateway={{ vm_gateway }} --nameserver={{ vm_dns }} --noipv6
+network --hostname {{ inventory_hostname }} --onboot yes --device eth0 --bootproto static  --ip={{ vm_ipaddr }} --netmask={{ vm_netmask }} --gateway={{ vm_gateway }} --nameserver={{ vm_dns }} --noipv6
 
 rootpw  "rhelrhel"
 
@@ -31,9 +31,9 @@ zerombr
 
 part /boot --fstype=ext4 --size=500
 part pv.253002 --grow --size=1
-volgroup vg_ipas --pesize=4096 pv.253002
-logvol / --fstype=ext4 --name=lv_root --vgname=vg_ipas --grow --size=1024 --maxsize=51200
-logvol swap --name=lv_swap --vgname=vg_ipas --grow --size=2016 --maxsize=2016
+volgroup vg_{{ inventory_hostname }} --pesize=4096 pv.253002
+logvol / --fstype=ext4 --name=lv_root --vgname=vg_{{ inventory_hostname }} --grow --size=1024 --maxsize=51200
+logvol swap --name=lv_swap --vgname=vg_{{ inventory_hostname }} --grow --size=2016 --maxsize=2016
 
 
 %packages
