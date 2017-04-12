@@ -36,8 +36,8 @@
             <readonly/>
         </disk>
 
-        <interface type='bridge'>
-            <source bridge='breth0'/>
+        <interface type='network'>
+            <source network='net23'/>
             <model type='virtio'/>
         </interface>
 

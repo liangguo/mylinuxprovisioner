@@ -8,9 +8,9 @@
   vars:
     vm_ipaddr: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
     vm_netmask: 255.255.255.0
-    vm_gateway: 192.168.2.1
-    vm_dns: 192.168.2.1
-    vm_base_url: http://192.168.2.12/y/
+    vm_gateway: 192.168.23.1
+    vm_dns: 192.168.23.1
+    vm_base_url: http://192.168.23.1/y/
     vm_repo_name: rhel69
     rhel_version: "6"
     force_create: false
