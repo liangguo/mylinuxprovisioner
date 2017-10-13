@@ -1,0 +1,4 @@
+default rhel65
+label rhel65
+   kernel vmlinuz
+   append initrd=initrd.img
