@@ -1,0 +1,144 @@
+---
+
+- name: Provision a CentOS VM on libvirt
+  hosts: vm
+  user: root
+  gather_facts: no
+
+  vars:
+    vm_ipaddr: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
+    vm_netmask: 255.255.255.0
+    vm_gateway: 192.168.23.1
+    vm_dns: 192.168.23.1
+    vm_base_url: http://192.168.23.1/y/www/ks/
+    vm_repo_name: rhel69
+    rhel_version: "6"
+    force_create: false
+    pxe_boot: false
+    
+  tasks:
+  - delegate_to: "{{ on_host }}"
+    block:
+    - name: Set Debian boot option
+      set_fact:
+        vm_bootopts: "debian-installer/language=en debian-installer/country=CN debian-installer/locale=en_US.UTF-8 keyboard-configuration/xkb-keymap=us netcfg/disable_autoconfig=true netcfg/disable_dhcp=true netcfg/no_default_route=true netcfg/get_hostname={{ inventory_hostname }}  netcfg/get_domain= netcfg/get_ipaddress={{ vm_ipaddr }} netcfg/get_netmask={{ vm_netmask }} netcfg/get_gateway={{ vm_gateway }} netcfg/get_nameservers={{ vm_dns }} netcfg/confirm_static=true DEBCONF_DEBUG=5 vga=788 url={{ vm_base_url }}/{{ inventory_hostname }}.ps "
+        #vm_bootopts: "auto=true priority=critical vga=788 url={{ vm_base_url }}/{{ inventory_hostname }}.ps "
+
+    - name: Stop virtual machine
+      command: virsh destroy "{{ inventory_hostname }}"
+      register: commandresult
+      ignore_errors: True
+      when: force_create == "true"
+      tags: removevm
+       
+    - name: Undefine virtual machine
+      virt_guest: guest={{ inventory_hostname }} state=absent
+      when: force_create == "true"
+      ignore_errors: True
+      tags: removevm
+      
+    - name: Delete virtual machine storage
+      file:
+        path:  "/y/vm/{{ inventory_hostname }}.qcow2"
+        state: absent
+      when: force_create == "true"
+      tags: removevm
+      ignore_errors: True
+
+    - name: Allocate storage for the VM
+      qemu_img:
+        dest: "/y/vm/{{ inventory_hostname }}.qcow2"
+        size: 20480
+
+    - name: Create a VM definition
+      template:
+        src: templates/vm.xml
+        dest: "/tmp/{{ inventory_hostname }}.xml"
+
+    - name: Create the VM
+      virt_guest:
+        guest: "{{ inventory_hostname }}"
+        src: "/tmp/{{ inventory_hostname }}.xml"
+      register: guests
+
+    - name: Create a group of unprovisioned systems
+      group_by:
+        key: "{{ guests.provisioning_status }}"
+
+    - name: Create VM ks files
+      template:
+        src: "templates/debian9.ps"
+        dest: "/y/www/ks/{{ inventory_hostname }}.ps"
+
+    - name: Boot the VM using the PXE images
+      virt_boot:
+        guest: "{{ inventory_hostname }}"
+        kernel: "/y/www/debian/stable/linux"
+        initrd: "/y/www/debian/stable/initrd.gz"
+        cmdline: "{{ vm_bootopts }}"
+      when: 
+        pxe_boot != "true"
+
+    - block:
+      - name: Create dnsmasq directory
+        file:
+          path: "/tmp/dnsmasq/tftp/pxelinux.cfg"
+          state: directory
+
+      - name: Generate dnsmasq configuration file
+        template:
+          src: "templates/dnsmasq.conf.t"
+          dest: "/tmp/dnsmasq/dnsmasq.conf"
+ 
+      - name: Generate default boot file
+        template:
+          src: "templates/pxedefault"
+          dest: "/tmp/dnsmasq/tftp/pxelinux.cfg/default"
+ 
+      - name: Copy pexlinux.0
+        copy:
+          src: "templates/pxelinux.0"
+          dest: "/tmp/dnsmasq/tftp/pxelinux.0"
+ 
+      - name: Copy vmlinuz file
+        copy:
+          src: "/y/www/yum/{{ vm_repo_name }}/images/pxeboot/vmlinuz"
+          dest: "/tmp/dnsmasq/tftp/vmlinuz"
+ 
+      - name: Copy pexlinux.0
+        copy:
+          src: "/y/www/yum/{{ vm_repo_name }}/images/pxeboot/initrd.img"
+          dest: "/tmp/dnsmasq/tftp/initrd.img"
+
+      - name: Boot the VM form network
+        virt_boot:
+          guest: "{{ inventory_hostname }}"
+          boot: network
+  
+      when: 
+         pxe_boot == "true"
+
+
+    - name: Wait until the VM stops
+      virt:
+        name: "{{ inventory_hostname }}"
+        command: status
+      register: result
+      until: "{{ result.status == 'shutdown' }}"
+      delay: 10
+      retries: 120
+
+    - name: Start the VM
+      virt_boot:
+        guest: "{{ inventory_hostname }}"
+        boot: hd
+
+    - name: Remove ks file
+      file:
+        path:  "/y/www/ks/{{ inventory_hostname }}.ks"
+        state: absent
+
+    - name: Remove ks file
+      file:
+        path:  "/tmp/{{ inventory_hostname }}.xml"
+        state: absent
