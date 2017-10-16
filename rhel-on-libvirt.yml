@@ -10,9 +10,9 @@
     vm_netmask: 255.255.255.0
     vm_gateway: 192.168.23.1
     vm_dns: 192.168.23.1
-    vm_base_url: http://192.168.23.1/y/
-    vm_repo_name: rhel69
-    rhel_version: "6"
+    vm_base_url: http://192.168.23.1/y/www/
+    vm_repo_name: rhel73
+    rhel_version: "7"
     force_create: false
     pxe_boot: false
     
