@@ -1,5 +1,5 @@
-hypervisor ansible_host=localhost ansible_python_interpreter=/usr/bin/python2
+hypervisor ansible_host=localhost ansible_python_interpreter=/usr/bin/python3
 
 [vm]
-rhel on_host=hypervisor ansible_host=192.168.23.69
+ansi on_host=hypervisor ansible_host=192.168.23.73
 
