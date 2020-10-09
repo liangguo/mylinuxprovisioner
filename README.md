@@ -23,7 +23,9 @@
 2. 初始化submodule, `git submodule init`
 3. 根据实际情况修改playbook及template中的环境变量
 4. 修改`hosts`文件, 此文件包含要新建的主机名和ip地址，可同时创建多个虚拟机
-5. 运行`ansible-playbook debian-on-libvirt.yml`创建虚拟机
+5. 运行`ansible-playbook debian-on-libvirt.yml`创建虚拟机, 如果虚拟机已经存在，可以使用参数`-e force_create=true`强制创建
+
+删除虚拟机可以运行`ansible-playbook -t removevm -e force_create=true rhel-on-libvirt.yml`
 
 # TODO
 
