@@ -124,7 +124,7 @@
         name: "{{ inventory_hostname }}"
         command: status
       register: result
-      until: "{{ result.status == 'shutdown' }}"
+      until: "result.status == 'shutdown'"
       delay: 10
       retries: 120
 
