@@ -10,11 +10,11 @@
     vm_netmask: 255.255.255.0
     vm_gateway: 192.168.23.1
     vm_dns: 192.168.23.1
-    vm_base_url: http://192.168.23.1/y/www/
+    vm_base_url: http://192.168.23.1/ywww/
     vm_repo_name: rhel73
     rhel_version: "7"
     force_create: false
-    pxe_boot: true
+    pxe_boot: false
     
   tasks:
   - delegate_to: "{{ on_host }}"
@@ -57,7 +57,7 @@
         dest: "/y/vm/{{ inventory_hostname }}.qcow2"
         size: 20480
 
-    - name: Create a VM definition
+    - name: Create VM definition
       template:
         src: templates/vm.xml
         dest: "/tmp/{{ inventory_hostname }}.xml"
@@ -84,7 +84,7 @@
         initrd: "/y/www/yum/{{ vm_repo_name }}/images/pxeboot/initrd.img"
         cmdline: "{{ vm_bootopts }}"
       when: 
-        pxe_boot == "false"
+        pxe_boot != "true"
 
     - block:
       - name: Create dnsmasq directory
@@ -131,7 +131,7 @@
         name: "{{ inventory_hostname }}"
         command: status
       register: result
-      until: "{{ result.status == 'shutdown' }}"
+      until: "result.status == 'shutdown'"
       delay: 10
       retries: 120
 
@@ -145,7 +145,7 @@
         path:  "/y/www/ks/{{ inventory_hostname }}.ks"
         state: absent
 
-    - name: Remove ks file
+    - name: Remove VM defination file
       file:
         path:  "/tmp/{{ inventory_hostname }}.xml"
         state: absent
